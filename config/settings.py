@@ -9,14 +9,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -------------------------
 # SECRET KEY
 # -------------------------
-# Use environment variable in production
-import os
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')# -------------------------
-# DEBUG & ALLOWED HOSTS
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-secret-key-for-dev')
+
+# -------------------------
+# DEBUG
 # -------------------------
 DEBUG = False
-ALLOWED_HOSTS = ['*']           # non-www version
 
+# -------------------------
+# ALLOWED HOSTS
+# -------------------------
+ALLOWED_HOSTS = [
+    "dipen-finance.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 # -------------------------
 # INSTALLED APPS
 # -------------------------
