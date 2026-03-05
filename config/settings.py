@@ -10,16 +10,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET KEY
 # -------------------------
 # Use environment variable in production
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-local-fallback-key')
-# -------------------------
+import os
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')# -------------------------
 # DEBUG & ALLOWED HOSTS
 # -------------------------
 DEBUG = False
-ALLOWED_HOSTS = [
-    'dipen-finance.onrender.com',  # Render URL
-    'www.dipenfinance.com',        # custom domain (www)
-    'dipenfinance.com',            # custom domain (non-www)
-]
+ALLOWED_HOSTS = ['*']           # non-www version
 
 # -------------------------
 # INSTALLED APPS
