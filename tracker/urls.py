@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import signup
 
 app_name = 'tracker'  # ← Add this line
 
@@ -9,4 +10,5 @@ urlpatterns = [
     path('edit/<int:transaction_id>/', views.edit_transaction, name='edit_transaction'),
     path('delete/<int:transaction_id>/', views.delete_transaction, name='delete_transaction'),
     path('categories/', views.manage_categories, name='manage_categories'),
+     path('signup/', signup, name='signup'),
 ]
