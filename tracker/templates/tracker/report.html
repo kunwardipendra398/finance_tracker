@@ -1,0 +1,34 @@
+{% extends 'tracker/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Report" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Monthly Report" %}</h1>
+
+<canvas id="incomeExpenseChart" width="400" height="200"></canvas>
+
+<script>
+const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+const data = {
+    labels: [{% for d in monthly_data %}'{{ d.month }}',{% endfor %}],
+    datasets: [
+        {
+            label: '{{ _("Income") }}',
+            data: [{% for d in monthly_data %}{{ d.income }},{% endfor %}],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        },
+        {
+            label: '{{ _("Expense") }}',
+            data: [{% for d in monthly_data %}{{ d.expense }},{% endfor %}],
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }
+    ]
+};
+const config = {type: 'bar', data: data, options: {responsive:true, scales:{y:{beginAtZero:true}}}};
+new Chart(ctx, config);
+</script>
+{% endblock %}

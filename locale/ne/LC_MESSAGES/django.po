@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Language: ne\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Finance Tracker"
+msgstr "वित्त ट्र्याकर"
+
+msgid "Add Transaction"
+msgstr "लेनदेन थप्नुहोस्"
+
+msgid "Transactions"
+msgstr "लेनदेनहरू"
+
+msgid "Report"
+msgstr "प्रतिवेदन"
+
+msgid "Login"
+msgstr "लगइन"
+
+msgid "Logout"
+msgstr "लगआउट"
+
+msgid "Register"
+msgstr "दर्ता गर्नुहोस्"
+
+msgid "Profile"
+msgstr "प्रोफाइल"
+
+msgid "Income"
+msgstr "आम्दानी"
+
+msgid "Expense"
+msgstr "खर्च"
+
+msgid "Update"
+msgstr "अपडेट गर्नुहोस्"

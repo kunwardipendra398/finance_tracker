@@ -1,0 +1,194 @@
+{% extends 'tracker/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% trans "Dashboard" %}</h1>
+
+<!-- Filter Form: Category & Month -->
+<form method="get" class="mb-4 row g-3">
+    <div class="col-md-4">
+        <label for="category" class="form-label">Filter by Category</label>
+        <select class="form-select" id="category" name="category" onchange="this.form.submit()">
+            <option value="all" {% if selected_category == 'all' %}selected{% endif %}>All Categories</option>
+            {% for cat in all_categories %}
+                <option value="{{ cat.id }}" {% if selected_category|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="month" class="form-label">Filter by Month</label>
+        <select class="form-select" id="month" name="month" onchange="this.form.submit()">
+            <option value="all" {% if selected_month == 'all' %}selected{% endif %}>All Months</option>
+            {% for m in months %}
+                <option value="{{ m }}" {% if selected_month|stringformat:"s" == m|stringformat:"s" %}selected{% endif %}>
+                    {{ m }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+<!-- Cards -->
+<div class="row mb-4">
+    <!-- Total Income / Expense / Balance cards here -->
+</div>
+<!-- Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Total Income" %}</h5>
+                <p class="card-text">{{ total_income }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Total Expense" %}</h5>
+                <p class="card-text">{{ total_expense }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Balance" %}</h5>
+                <p class="card-text">{{ balance }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Pie Chart: Income vs Expense -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Income vs Expense</h5>
+        <canvas id="financeChart"></canvas>
+    </div>
+</div>
+
+<!-- Bar Chart: Expense by Category -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Expense by Category</h5>
+        <canvas id="categoryChart"></canvas>
+    </div>
+</div>
+
+<!-- Latest Transactions -->
+<h3>{% trans "Latest Transactions" %}</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{% trans "Title" %}</th>
+            <th>{% trans "Amount" %}</th>
+            <th>{% trans "Type" %}</th>
+            <th>{% trans "Category" %}</th>
+            <th>{% trans "Date" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.title }}</td>
+
+            <!-- Colored Amount -->
+            <td>
+                {% if t.transaction_type|lower == "income" %}
+                    <span style="color:green;">+{{ t.amount }}</span>
+                {% else %}
+                    <span style="color:red;">-{{ t.amount }}</span>
+                {% endif %}
+            </td>
+
+            <!-- Type Badge -->
+            <td>
+                {% if t.transaction_type|lower == "income" %}
+                    <span class="badge bg-success">Income</span>
+                {% else %}
+                    <span class="badge bg-danger">Expense</span>
+                {% endif %}
+            </td>
+
+            <td>{{ t.category.name }}</td>
+            <td>{{ t.date|date:"SHORT_DATE_FORMAT" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">{% trans "No transactions yet." %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Pass Python lists safely to JS -->
+{{ category_labels|json_script:"category-labels" }}
+{{ category_values|json_script:"category-values" }}
+
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Pie chart: Income vs Expense
+const ctxPie = document.getElementById('financeChart');
+new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+        labels: ['Income', 'Expense'],
+        datasets: [{
+            data: [{{ total_income|default:0 }}, {{ total_expense|default:0 }}],
+            backgroundColor: ['#28a745', '#dc3545']
+        }]
+    }
+});
+
+// Bar chart: Expense by Category
+const labels = JSON.parse(document.getElementById('category-labels').textContent);
+const values = JSON.parse(document.getElementById('category-values').textContent);
+
+if (labels.length > 0) {
+    const ctxCategory = document.getElementById('categoryChart');
+
+    // Consistent color palette for categories
+    const colorPalette = [
+        '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF',
+        '#FF9F40','#8DFF33','#FF33F6','#33FFF0','#FF5733'
+    ];
+
+    const backgroundColors = labels.map((_, index) => colorPalette[index % colorPalette.length]);
+    const borderColors = backgroundColors.map(c => c);
+
+    new Chart(ctxCategory, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Expense',
+                data: values,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            },
+            plugins: {
+                legend: { display: false } // hide legend
+            }
+        }
+    });
+} else {
+    document.getElementById('categoryChart').parentNode.innerHTML =
+        "<p class='text-muted'>No expense categories to display.</p>";
+}
+</script>
+
+{% endblock %}
