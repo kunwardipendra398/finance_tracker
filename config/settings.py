@@ -1,13 +1,29 @@
 import os
 from pathlib import Path
 
+# -------------------------
+# BASE DIRECTORY
+# -------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'your-secret-key'  # replace with a real secret
-
+# -------------------------
+# SECRET KEY
+# -------------------------
+# Use environment variable in production
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-local-fallback-key')
+# -------------------------
+# DEBUG & ALLOWED HOSTS
+# -------------------------
 DEBUG = False
-ALLOWED_HOSTS = ['www.dipenfinance.com', 'dipenfinance.com']
+ALLOWED_HOSTS = [
+    'dipen-finance.onrender.com',  # Render URL
+    'www.dipenfinance.com',        # custom domain (www)
+    'dipenfinance.com',            # custom domain (non-www)
+]
 
+# -------------------------
+# INSTALLED APPS
+# -------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,8 +36,12 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
 ]
 
+# -------------------------
+# MIDDLEWARE
+# -------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # serve static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # enable i18n
     'django.middleware.common.CommonMiddleware',
@@ -31,13 +51,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# -------------------------
+# ROOT URLCONF & WSGI
+# -------------------------
 ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
 
-# config/settings.py
+# -------------------------
+# TEMPLATES
+# -------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # should already exist
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -50,8 +76,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
+# -------------------------
+# DATABASE (SQLite for now)
+# -------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -59,34 +86,57 @@ DATABASES = {
     }
 }
 
+# -------------------------
+# PASSWORD VALIDATION
+# -------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
 ]
 
-LANGUAGE_CODE = 'en'  # default
+# -------------------------
+# INTERNATIONALIZATION
+# -------------------------
+LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('en', 'English'),
     ('ne', 'Nepali'),
 ]
-
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
-
 TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 
+# -------------------------
+# STATIC FILES
+# -------------------------
 STATIC_URL = '/static/'
-import os
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# -------------------------
+# MEDIA FILES
+# -------------------------
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# -------------------------
+# SECURITY
+# -------------------------
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
-LOGIN_REDIRECT_URL = '/'      # After login, redirect here
-LOGIN_URL = '/accounts/login/'  # URL to use for login required redirects
+# -------------------------
+# AUTHENTICATION REDIRECTS
+# -------------------------
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
+
+# -------------------------
+# DEFAULT AUTO FIELD
+# -------------------------
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
