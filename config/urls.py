@@ -15,7 +15,7 @@ urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('tracker.urls')),      # Tracker app
     path('users/', include('users.urls')),  # Users app
-    path('accounts/', include('django.contrib.auth.urls')),  # Login/Logout
+   path('accounts/', include('django.contrib.auth.urls')),
 )
 
 # Media files (only in DEBUG mode)
